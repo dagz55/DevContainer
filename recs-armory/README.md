@@ -40,7 +40,7 @@ With these prerequisites in place, you're ready to unleash the full potential of
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/rsuar29/recs-armorygit
+   git clone https://github.com/rsuar29/recs-armory.git
 
 2. Navigate to the project directory:
     cd recs-armory
