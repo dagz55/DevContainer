@@ -35,12 +35,15 @@ RUN curl -LO https://github.com/Azure/kubelogin/releases/download/v0.0.20/kubelo
     mv bin/linux_amd64/kubelogin /usr/local/bin/ && \
     rm -rf kubelogin-linux-amd64.zip bin/
 
-# Copy the Istio installation script
-COPY install-istio.sh /usr/local/bin/
+# Download Istio
+RUN curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.17.1 TARGET_ARCH=x86_64 sh -
+RUN mv istio-1.17.1 /opt/istio
 
-# Install istioctl
-RUN chmod +x /usr/local/bin/install-istio.sh && \
-    /usr/local/bin/install-istio.sh
+# Copy the entrypoint script
+COPY entrypoint.sh /usr/local/bin/
+
+# Set the entrypoint script as executable
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set the default shell to PowerShell
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
@@ -48,5 +51,5 @@ SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference
 # Set the working directory
 WORKDIR /app
 
-# Run PowerShell when the container starts
-CMD ["pwsh"]
+# Set the entrypoint script as the container entrypoint
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
