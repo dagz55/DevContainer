@@ -1,13 +1,20 @@
 #!/bin/bash
 
-# Fetch the latest Istio version
-ISTIO_VERSION=$(curl -L https://istio.io/downloadIstio | grep -oP 'istio-\K\d+\.\d+\.\d+')
+# Download and extract Istio
+curl -L https://istio.io/downloadIstio | sh -
 
-# Download and install Istio
-curl -L https://istio.io/downloadIstio | ISTIO_VERSION=${ISTIO_VERSION} sh -
+# Move to the Istio package directory
+cd istio-* || { echo "Failed to change directory to istio-*"; exit 1; }
 
-# Move the istioctl binary to /usr/local/bin/
-mv istio-${ISTIO_VERSION}/bin/istioctl /usr/local/bin/
+# Add istioctl to the PATH
+export PATH=$PWD/bin:$PATH
+
+# Install Istio using the demo configuration profile
+istioctl install --set profile=demo -y
+
+# Label the default namespace for Istio sidecar injection
+kubectl label namespace default istio-injection=enabled
 
 # Clean up the downloaded Istio directory
-rm -rf istio-${ISTIO_VERSION}
+cd ../
+rm -rf istio-*
