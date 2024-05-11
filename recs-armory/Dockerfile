@@ -1,8 +1,8 @@
 FROM mcr.microsoft.com/powershell:latest
 
-# Install dependencies (curl, gnupg)
+# Install dependencies (curl, gnupg, unzip)
 RUN apt-get update && \
-    apt-get install -y curl gnupg && \
+    apt-get install -y curl gnupg unzip && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python
@@ -35,10 +35,12 @@ RUN curl -LO https://github.com/Azure/kubelogin/releases/download/v0.0.20/kubelo
     mv bin/linux_amd64/kubelogin /usr/local/bin/ && \
     rm -rf kubelogin-linux-amd64.zip bin/
 
+# Copy the Istio installation script
+COPY install-istio.sh /usr/local/bin/
+
 # Install istioctl
-RUN curl -L https://istio.io/downloadIstio | sh - && \
-    mv istio-*/bin/istioctl /usr/local/bin/ && \
-    rm -rf istio-*
+RUN chmod +x /usr/local/bin/install-istio.sh && \
+    /usr/local/bin/install-istio.sh
 
 # Set the default shell to PowerShell
 SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
